@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 
 public class PlayerBhv : MonoBehaviour
@@ -8,12 +8,21 @@ public class PlayerBhv : MonoBehaviour
 	private KeyCode left = KeyCode.LeftArrow;
 	private KeyCode down = KeyCode.DownArrow;
 	private KeyCode right = KeyCode.RightArrow;
+	private KeyCode lp = KeyCode.A;
+	private KeyCode mp = KeyCode.S;
+	private KeyCode hp = KeyCode.D;
+	private KeyCode lk = KeyCode.Z;
+	private KeyCode mk = KeyCode.X;
+	private KeyCode hk = KeyCode.C;
 	private bool jumping;
 	private bool walking;
 	private bool backingUp;
 	private bool crouching;
 	private bool isGrounded; // is player on the ground?
+
 	int currentState = CharStateBhv.ST_JUMPING;
+	int currentAtkState = CharStateBhv.ST_ATK_NONE;
+	int currentStateMod = CharStateBhv.ST_DISTANCE_FAR;
 	string currentDirection = "left";
 	public Animator animator;
 	public float walkSpeed = 1; // player left right walk speed
@@ -24,25 +33,43 @@ public class PlayerBhv : MonoBehaviour
 	{
 		rb = GetComponent<Rigidbody2D> ();
 		animator = transform.GetComponent<Animator> ();
+
+		setStateMod (CharStateBhv.ST_DISTANCE_FAR);
 	}
 	
 	void FixedUpdate ()
 	{
 		if (isGrounded && Input.GetKeyDown (up)) {
-			changeState(CharStateBhv.ST_JUMPING);
+			setState (CharStateBhv.ST_JUMPING);
 			rb.AddForce (new Vector2 (0, jumpForce));
 			isGrounded = false;
 			//Debug.Log("registering input @"+Time.time);
 		} else if (Input.GetKey (right) || Input.GetKey (left)) { 
 			if (Input.GetKey (right)) {
-				changeState(CharStateBhv.ST_WALKING_F);
+				setState (CharStateBhv.ST_WALKING_F);
 			} else if (Input.GetKey (left)) {
-				changeState(CharStateBhv.ST_WALKING_B);
+				setState (CharStateBhv.ST_WALKING_B);
 			}
 		} else if (Input.GetKey (down)) { 
-			changeState(CharStateBhv.ST_CROUCHING);
+			setState (CharStateBhv.ST_CROUCHING);
 		} else {
-			changeState(CharStateBhv.ST_IDLE);
+			setState (CharStateBhv.ST_STANDING);
+			//checkAttackState();
+			if (Input.GetKey (lp)) {
+				setAtkState (CharStateBhv.ST_ATK_LP);
+			} else if (Input.GetKey (mp)) {
+				setAtkState (CharStateBhv.ST_ATK_MP);
+			} else if (Input.GetKey (hp)) {
+				setAtkState (CharStateBhv.ST_ATK_HP);
+			} else if (Input.GetKey (lk)) {
+				setAtkState (CharStateBhv.ST_ATK_LK);
+			} else if (Input.GetKey (mk)) {
+				setAtkState (CharStateBhv.ST_ATK_MK);
+			} else if (Input.GetKey (hk)) {
+				setAtkState (CharStateBhv.ST_ATK_HK);
+			} else {
+				setAtkState (CharStateBhv.ST_ATK_NONE);
+			}
 		}
 	}
 
@@ -65,38 +92,22 @@ public class PlayerBhv : MonoBehaviour
 		throw new MissingComponentException ();
 	}
 
-	private void changeState (int state)
+	private void setState (int state)
 	{
-		if (currentState == state)
-			return;
-		
-		switch (state) {
-		case CharStateBhv.ST_WALKING_F:
-			setState(CharStateBhv.ST_WALKING_F);
-			break;
-			
-		case CharStateBhv.ST_CROUCHING:
-			setState ( CharStateBhv.ST_CROUCHING);
-			break;
-			
-		case CharStateBhv.ST_JUMPING:
-			setState (CharStateBhv.ST_JUMPING);
-			break;
-			
-		case CharStateBhv.ST_IDLE:
-			setState (CharStateBhv.ST_IDLE);
-			break;
-			
-		case CharStateBhv.ST_WALKING_B:
-			setState (CharStateBhv.ST_WALKING_B);
-			break;
-		}
-		
+		animator.SetInteger ("state", state);
 		currentState = state;
 	}
 
-	private void setState(int state) {
-		animator.SetInteger ("state", state);
+	private void setAtkState (int state)
+	{
+		animator.SetInteger ("atk_state", state);
+		currentAtkState = state;
+	}
+
+	private void setStateMod (int state)
+	{
+		animator.SetInteger ("state_mod", state);
+		currentStateMod = state;
 	}
 
 	void changeDirection (string direction)
@@ -117,7 +128,7 @@ public class PlayerBhv : MonoBehaviour
 		//Debug.Log ("col@"+Time.time);
 		if (coll.gameObject.name == "Ground") {
 			isGrounded = true;
-			changeState (CharStateBhv.ST_IDLE);	
+			setState (CharStateBhv.ST_STANDING);	
 		}	
 	}
 }
