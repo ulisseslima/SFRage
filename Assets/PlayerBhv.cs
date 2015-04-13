@@ -3,6 +3,7 @@ using System.Collections;
 
 public class PlayerBhv : MonoBehaviour
 {
+	private Transform player;
 	private Rigidbody2D rb;
 	private KeyCode up = KeyCode.UpArrow;
 	private KeyCode left = KeyCode.LeftArrow;
@@ -31,6 +32,7 @@ public class PlayerBhv : MonoBehaviour
 	// Use this for initialization
 	void Start ()
 	{
+		player = transform.parent;
 		rb = GetComponent<Rigidbody2D> ();
 		animator = transform.GetComponent<Animator> ();
 
@@ -47,8 +49,10 @@ public class PlayerBhv : MonoBehaviour
 		} else if (Input.GetKey (right) || Input.GetKey (left)) { 
 			if (Input.GetKey (right)) {
 				setState (CharStateBhv.ST_WALKING_F);
+				translate (Vector3.right);
 			} else if (Input.GetKey (left)) {
 				setState (CharStateBhv.ST_WALKING_B);
+				translate (Vector3.left);
 			}
 		} else if (Input.GetKey (down)) { 
 			setState (CharStateBhv.ST_CROUCHING);
@@ -71,6 +75,11 @@ public class PlayerBhv : MonoBehaviour
 				setAtkState (CharStateBhv.ST_ATK_NONE);
 			}
 		}
+	}
+
+	void translate (Vector3 direction)
+	{
+		player.Translate (direction * walkSpeed * Time.deltaTime);
 	}
 
 	private void cancelWalk ()
@@ -114,10 +123,10 @@ public class PlayerBhv : MonoBehaviour
 	{
 		if (currentDirection != direction) {
 			if (direction == "right") {
-				transform.Rotate (0, 180, 0);
+				player.Rotate (0, 180, 0);
 				currentDirection = "right";
 			} else if (direction == "left") {
-				transform.Rotate (0, -180, 0);
+				player.Rotate (0, -180, 0);
 				currentDirection = "left";
 			}
 		}	

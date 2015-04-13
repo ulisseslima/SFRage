@@ -46,9 +46,11 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\Manager.cs" />
      <Compile Include="Assets\PlayerBhv.cs" />
+     <Compile Include="Assets\Resources\bg\ReplicatingBhv.cs" />
      <Compile Include="Assets\Resources\chars\CharStateBhv.cs" />
-     <Compile Include="Assets\Resources\chars\CrouchBhv.cs" />
+     <Compile Include="Assets\Resources\chars\chun\CrouchBhv.cs" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>
