@@ -9,7 +9,8 @@ public class ReplicatingBhv : MonoBehaviour {
 
 	void OnBecameInvisible() {
 		if (seen) {
-			Invoke("rearrange", rearrangeDelay);
+//			Invoke("rearrange", rearrangeDelay);
+			rearrange();
 		}
 	}
 
@@ -20,8 +21,8 @@ public class ReplicatingBhv : MonoBehaviour {
 	void rearrange ()
 	{
 		seen = false;
-		Vector3 pos = transform.position;
+		Vector3 pos = transform.parent.transform.position;
 		pos.x += (bgWidth * manager.backgroundPool);
-		transform.position = pos;
+		transform.parent.transform.position = pos;
 	}
 }
