@@ -19,7 +19,8 @@ public class PlayerBhv : MonoBehaviour
 	private bool walking;
 	private bool backingUp;
 	private bool crouching;
-	private bool isGrounded; // is player on the ground?
+	private bool onGround; // is player on the ground?
+	private AnimatorStateInfo animatorState;
 
 	int currentState = CharStateBhv.ST_JUMPING;
 	int currentAtkState = CharStateBhv.ST_ATK_NONE;
@@ -41,23 +42,32 @@ public class PlayerBhv : MonoBehaviour
 	
 	void FixedUpdate ()
 	{
-		if (isGrounded && Input.GetKeyDown (up)) {
+		if ((isGrounded() && !isCrouching()) && Input.GetKeyDown (up)) {
 			setState (CharStateBhv.ST_JUMPING);
+			Debug.Log ("jumping");
 			rb.AddForce (new Vector2 (0, jumpForce));
-			isGrounded = false;
+			onGround = false;
 			//Debug.Log("registering input @"+Time.time);
-		} else if (Input.GetKey (right) || Input.GetKey (left)) { 
+		} else if (!isCrouching() && (Input.GetKey (right) || Input.GetKey (left))) { 
 			if (Input.GetKey (right)) {
-				setState (CharStateBhv.ST_WALKING_F);
-				translate (Vector3.right);
+				if (isGrounded() && !isCrouching())
+					setState (CharStateBhv.ST_WALKING_F);
+
+				if (!isCrouching()) translate (Vector3.right);
 			} else if (Input.GetKey (left)) {
-				setState (CharStateBhv.ST_WALKING_B);
-				translate (Vector3.left);
+				if (isGrounded() && !isCrouching())
+					setState (CharStateBhv.ST_WALKING_B);
+
+				if (!isCrouching()) {
+					translate (Vector3.left);
+				}
 			}
 		} else if (Input.GetKey (down)) { 
 			setState (CharStateBhv.ST_CROUCHING);
+			crouching = true;
 		} else {
 			setState (CharStateBhv.ST_STANDING);
+			crouching = false;
 			//checkAttackState();
 			if (Input.GetKey (lp)) {
 				setAtkState (CharStateBhv.ST_ATK_LP);
@@ -101,6 +111,23 @@ public class PlayerBhv : MonoBehaviour
 		throw new MissingComponentException ();
 	}
 
+	private bool isGrounded ()
+	{
+		return onGround == true && getState () != 5;
+	}
+
+	private bool isCrouching ()
+	{
+		return getState () == 6 || 
+				crouching || 
+				currAnimStateEq(CharStateBhv.ANIM_ST_CROUCHING);
+	}
+
+	private int getState ()
+	{
+		return animator.GetInteger ("state");
+	}
+
 	private void setState (int state)
 	{
 		animator.SetInteger ("state", state);
@@ -136,8 +163,18 @@ public class PlayerBhv : MonoBehaviour
 	{
 		//Debug.Log ("col@"+Time.time);
 		if (coll.gameObject.name == "Ground") {
-			isGrounded = true;
+			onGround = true;
+			crouching = false;
 			setState (CharStateBhv.ST_STANDING);	
 		}	
+	}
+
+	/**
+	 * @param name - animation state name.
+	 * @returns true if the current animation state equals the one passed in.
+	 */
+	private bool currAnimStateEq(int hash) {
+		animatorState = animator.GetCurrentAnimatorStateInfo (0);
+		return animatorState.shortNameHash == hash;
 	}
 }

@@ -35,4 +35,6 @@ public static class CharStateBhv {
 	public const int ST_ATK_SPECIAL_3 = -22;
 
 	public const int ST_ATK_SUPER_ART = -30;
+
+	public const int ANIM_ST_CROUCHING = -2139688168;
 }
