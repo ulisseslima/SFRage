@@ -46,6 +46,7 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\EnemyBhv.cs" />
      <Compile Include="Assets\Manager.cs" />
      <Compile Include="Assets\PlayerBhv.cs" />
      <Compile Include="Assets\Resources\bg\ReplicatingBhv.cs" />

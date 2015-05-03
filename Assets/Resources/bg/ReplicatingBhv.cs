@@ -22,7 +22,7 @@ public class ReplicatingBhv : MonoBehaviour {
 	{
 		seen = false;
 		Vector3 pos = transform.parent.transform.position;
-		pos.x += (bgWidth * manager.backgroundPool);
+		pos.x += (bgWidth * manager.backgroundPoolSize);
 		transform.parent.transform.position = pos;
 	}
 }
